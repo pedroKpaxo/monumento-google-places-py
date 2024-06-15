@@ -1,7 +1,8 @@
-import aiohttp
 from abc import ABC, abstractmethod
-from .logger import setup_logger
 from typing import Optional, TypedDict
+import aiohttp
+
+from .logger import setup_logger
 
 
 class AbstractPlaceSearcher(ABC):

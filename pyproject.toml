@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "monumentoGooglePlaces"
+version = "0.1.0"
+description = "A python helper to use google places api"
+authors = ["pedrokpaxo <pedro@monumentosoftware.com.br>"]
+license = "MIT"
+readme = "README.md"
+exclude = ["local_scripts", "local_data"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+geopandas = "^1.0.1"
+rich = "^13.9.2"
+aiohttp = "^3.10.9"
+pydantic = "^2.9.2"
+pymongo = "^4.10.1"
+python-dotenv = "^1.0.1"
+googlemaps = "^4.10.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

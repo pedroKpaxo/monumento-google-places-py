@@ -4,6 +4,7 @@
 local_data/*
 TerraDatabase/production_data/local_data/*
 local_backup/*
+local_data/
 
 ### OSX ###
 .DS_Store

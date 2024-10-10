@@ -13,17 +13,8 @@ class AbstractPlaceSearcher(ABC):
         self.logger = setup_logger(self.__class__.__name__)
 
     @abstractmethod
-    async def make_search(self, query: str) -> dict:
+    async def make_search(self) -> dict:
         pass
-
-
-class NearbySearchParams(TypedDict, total=False):
-    """ TypedDict for the parameters of the Google Places API nearby search request."""
-    keyword: str
-    location: str
-    radius: int
-    type: str
-    key: str
 
 
 class PlaceSearchParams(TypedDict):
@@ -49,11 +40,11 @@ class GooglePlaceSearcher(AbstractPlaceSearcher):
 
     BASE_URL = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/json'
 
-    async def make_search(self, query: str) -> dict:
+    async def make_search(self, query: str, fields: list[str] = []) -> dict:
         params: PlaceSearchParams = {
             'input': query,
             'inputtype': 'textquery',
-            'fields': 'place_id',
+            'fields': ['place_id', *fields],
             'key': self.api_key
         }
         async with aiohttp.ClientSession() as session:
@@ -84,43 +75,3 @@ class GooglePlacesDetailSearcher(AbstractPlaceSearcher):
                 if response.status != 200:
                     self.logger.error(f'Error {response.status}: {await response.text()}')
                 return await response.json()
-
-
-class GooglePlacesNearbySearcher(AbstractPlaceSearcher):
-    """
-    Class to search for nearby places using the Google Places API.
-    It returns an array of places instead a single place.
-    """
-
-    BASE_URL = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-
-    def construct_params(self, location: str, radius: int, keyword: Optional[str] = None, type_: Optional[str] = None) -> NearbySearchParams:
-        params: NearbySearchParams = {
-            'location': location,
-            'radius': radius,
-            'key': self.api_key
-        }
-        if keyword:
-            params['keyword'] = keyword
-        if type_:
-            params['type'] = type_
-        return params
-
-    async def make_search(self, location: str, radius: int, keyword: Optional[str] = None, type_: Optional[str] = None) -> dict:
-        params: NearbySearchParams = {
-            'location': location,
-            'radius': radius,
-            'key': self.api_key
-        }
-        if keyword:
-            params['keyword'] = keyword
-        if type_:
-            params['type'] = type_
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(self.BASE_URL, params=params) as response:
-                if response.status == 200:
-                    return await response.json()
-                else:
-                    self.logger.error(f'Failed to fetch data: {response.status}, {await response.text()}')
-                    return await response.json()
